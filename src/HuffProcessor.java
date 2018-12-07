@@ -74,6 +74,7 @@ public class HuffProcessor {
 			if (current.myLeft != null  && current.myRight != null) {
 				out.writeBits(1, 0);
 				writeHeader(root.myLeft, out);
+				out.writeBits(1, 0);
 				writeHeader(root.myRight, out);
 			}
 			if (current.myLeft != null && current.myRight == null) {
