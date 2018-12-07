@@ -73,17 +73,16 @@ public class HuffProcessor {
 		if (current != null) {
 			if (current.myLeft != null  && current.myRight != null) {
 				out.writeBits(1, 0);
-				writeHeader(root.myLeft, out);
-				out.writeBits(1, 0);
-				writeHeader(root.myRight, out);
+				writeHeader(current.myLeft, out);
+				writeHeader(current.myRight, out);
 			}
 			if (current.myLeft != null && current.myRight == null) {
 				out.writeBits(1, 0);
-				writeHeader(root.myLeft,out);
+				writeHeader(current.myLeft,out);
 			}
 			if (current.myLeft == null && current.myRight != null) {
 				out.writeBits(1, 0);
-				writeHeader(root.myRight,out);
+				writeHeader(current.myRight,out);
 			}
 			if (current.myLeft == null && current.myRight == null) {
 				out.writeBits(1,1);
@@ -104,23 +103,23 @@ public class HuffProcessor {
 			return;
 		}
 		if (root.myLeft == null && root.myRight!= null) {
-			codingHelper(root.myRight, str+=1, encodings);
+			codingHelper(root.myRight, str+"1", encodings);
 		}
 		if (root.myLeft != null && root.myRight== null) {
-			codingHelper(root.myLeft, str+=0, encodings);
+			codingHelper(root.myLeft, str+"0", encodings);
 		}
 		if (root.myLeft == null && root.myRight == null) {
 			encodings[root.myValue] = str;
 			return;
 		}
-		codingHelper(root.myLeft, str+=0, encodings);
-		codingHelper(root.myRight, str+=1, encodings);
+		codingHelper(root.myLeft, str+"0", encodings);
+		codingHelper(root.myRight, str+"1", encodings);
 		
 	}
 	
 	private HuffNode makeTreeFRomCounts(int[] counts) {
 		PriorityQueue<HuffNode> pq = new PriorityQueue<>();
-		for (int k = 0; k < counts.length ; k+=1) {
+		for (int k = 0; k < counts.length ; k++) {
 			if (counts[k] == 0) {
 				continue;
 			}
@@ -224,3 +223,5 @@ public void decompress(BitInputStream in, BitOutputStream out) {
 		
 	}
 }
+
+
