@@ -23,13 +23,45 @@ public class HuffMainCompress {
 		out.close();
 	}
 	private void writeCompressedBits(String[] codings, BitInputStream in, BitOutputStream out) {
-		// TODO Auto-generated method stub
+		
+		while (true) {
+			int bits = in.readBits(BITS_PER_WORD);
+			if (bits == -1) {
+				break;
+			}
+			String code = codings[bits];
+			out.writeBits(code.length(), Integer.parseInt(code, 2));
+		}
+		String code = codings[PSEUDO_EOF];
+		out.writeBits(code.length(), Integer.parseInt(code, 2));
+		out.close();
+		
 		
 	}
 	private void writeHeader(HuffNode root, BitOutputStream out) {
-		// TODO Auto-generated method stub
-		
+		HuffNode current = root;
+		while (current != null) {
+			if (current.myLeft != null  && current.myRight != null) {
+				out.writeBits(1, 0);
+				writeHeader(root.myLeft, out);
+				writeHeader(root.myRight, out);
+			}
+			if (current.myLeft != null && current.myRight == null) {
+				out.writeBits(1, 0);
+				writeHeader(root.myLeft,out);
+			}
+			if (current.myLeft == null && current.myRight != null) {
+				out.writeBits(1, 0);
+				writeHeader(root.myRight,out);
+			}
+			if (current.myLeft == null && current.myRight == null) {
+				out.writeBits(1,1);
+				out.writeBits(BITS_PER_WORD +1 , current.myValue);
+			}
+		}
+		out.close();	
 	}
+	
 	private String[] makeCodingsFromTree(HuffNode root) {
 		String [] encodings = new String[ALPH_SIZE +1];
 		codingHelper(root, "", encodings);
@@ -38,9 +70,21 @@ public class HuffMainCompress {
 	}
 	
 	private void codingHelper(HuffNode root, String str, String[] encodings) {
-		if (root.myLeft == null && root.myRight == null) {
-			encodings[root.myValue] = path;
+		if (root == null) {
+			return;
 		}
+		if (root.myLeft == null && root.myRight!= null) {
+			codingHelper(root.myRight, str+=1, encodings);
+		}
+		if (root.myLeft != null && root.myRight== null) {
+			codingHelper(root.myLeft, str+=0, encodings);
+		}
+		if (root.myLeft == null && root.myRight == null) {
+			encodings[root.myValue] = str;
+			return;
+		}
+		codingHelper(root.myLeft, str+=0, encodings);
+		codingHelper(root.myRight, str+=1, encodings);
 		
 	}
 	
@@ -56,9 +100,8 @@ public class HuffMainCompress {
 			HuffNode t = new HuffNode(0,(left.myWeight+right.myWeight), left, right);
 			pq.add(t);
 		}
-		//remove the smallest of the two?
 		HuffNode root = pq.remove();
-		return null;
+		return root;
 	}
 	
 	//returns array of frequencies for each 8 bit stream

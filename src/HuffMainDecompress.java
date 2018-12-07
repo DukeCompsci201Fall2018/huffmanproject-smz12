@@ -51,7 +51,8 @@ public void decompress(BitInputStream in, BitOutputStream out) {
 				}
 				
 			}
-		} 
+		}
+		out.close();
 		
 	}
 
