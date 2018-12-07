@@ -120,6 +120,9 @@ public class HuffProcessor {
 	private HuffNode makeTreeFRomCounts(int[] counts) {
 		PriorityQueue<HuffNode> pq = new PriorityQueue<>();
 		for (int k = 0; counts[k] > 0; k+=1) {
+			if (counts[k] == 0) {
+				continue;
+			}
 			pq.add(new HuffNode(k, counts[k], null, null));
 		}
 		
